@@ -61,12 +61,43 @@
 }
 
 .pageCreateDenunciation-main-form__fieldset {
+	position: relative;
 	border: 0;
 }
-
 .pageCreateDenunciation-main-form__fieldset legend {
 	display: none;
 }
+.barSearchMap {
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	min-width: 50px;
+	height: 50px;
+	z-index: 10;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 5px;
+	background: white;
+	border-radius: 25px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.barSearchMap__icon {
+	position: absolute;
+	padding: 9px;
+	cursor: pointer;
+}
+.barSearchMap__input {
+	outline: none;
+	border: 1.5px solid rgba(0, 0, 0, 0.1);
+	border-radius: 25px;
+	color: rgba(0, 0, 0, 0.5);
+	padding: 2px 15px;
+}
+.pageCreateDenunciation-main-form__fieldset Map {
+	z-index: 4 !important;
+}
+
 .pageCreateDenunciation-main-form-groupInput {
 	margin-top: 24px;
 	padding: 0 15px;

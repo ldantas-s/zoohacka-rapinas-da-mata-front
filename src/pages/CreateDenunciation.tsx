@@ -4,7 +4,7 @@ import { LeafletMouseEvent } from "leaflet";
 
 // import { useHistory } from "react-router-dom";
 // Icons
-import { FiPlus } from "react-icons/fi";
+import { FiPlus, FiSearch } from "react-icons/fi";
 // styles
 import "../assets/css/pages/create-denunciation.css";
 // utils
@@ -30,6 +30,7 @@ export default function CreateDenunciation() {
 		report_time: new Date().getTime(),
 		report_day: new Date().getDate(),
 	});
+	const [stateBarSearch, setStateBarSearch] = useState(false);
 
 	function handleMapClick(event: LeafletMouseEvent) {
 		const { lat: latitude, lng: longitude } = event.latlng;
@@ -132,9 +133,25 @@ export default function CreateDenunciation() {
 					<fieldset className="pageCreateDenunciation-main-form__fieldset">
 						<legend>Dados</legend>
 
+						<div className="barSearchMap">
+							{stateBarSearch && (
+								<input
+									className="barSearchMap__input"
+									type="text"
+									autoFocus={stateBarSearch}
+									onBlur={() => setStateBarSearch(false)}
+								/>
+							)}
+							<FiSearch
+								className="barSearchMap__icon"
+								size={34}
+								stroke="black"
+								onClick={() => setStateBarSearch(true)}
+							/>
+						</div>
 						<Map
 							center={[geoLocation.latitude, geoLocation.longitude]}
-							style={{ width: "100%", height: 280 }}
+							style={{ width: "100%", height: 280, zIndex: 4 }}
 							zoom={geoLocation.zoom}
 							onClick={handleMapClick}
 						>

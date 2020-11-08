@@ -1,0 +1,33 @@
+:root {
+	--color-primary: #26a69a;
+	--color-secundary: #d4e157;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	color: #fff;
+	line-height: 1.7em;
+}
+
+html,
+body {
+	width: 100%;
+	height: 100%;
+	font-family: "Dosis", sans-serif;
+	font-size: 18px;
+}
+
+h1 {
+	font-size: 2rem;
+}
+h2 {
+	font-size: 1.33rem;
+}
+
+input,
+textarea {
+	font-size: 18px;
+	font-weight: 400;
+}

@@ -2,7 +2,6 @@ import React, { FormEvent, useState, ChangeEvent, useEffect } from "react";
 import { Map, Marker, TileLayer } from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
 
-// import { useHistory } from "react-router-dom";
 // Icons
 import { FiPlus, FiSearch } from "react-icons/fi";
 // styles
@@ -10,7 +9,12 @@ import "../assets/css/pages/create-denunciation.css";
 // utils
 import MapMarker from "../utils/MapMarker";
 //servies
-import api from "../services/api";
+// import api from "../services/api";
+
+// import useStorage from "../hooks/useStorage";
+import { agFirestore, agStorage, timestamp } from "../firebase/config";
+import postFirebase from "../utils/postFirebase";
+// import { info } from "console";
 
 export default function CreateDenunciation() {
 	// const hisotry = useHistory();
@@ -19,19 +23,19 @@ export default function CreateDenunciation() {
 		longitude: 0,
 		zoom: 15,
 	});
-	const [imagesSelected, setImagesSelected] = useState<File[]>([]);
+	const [imagesSelected, setImagesSelected] = useState<File>();
 	const [imagesPreview, setImagesPreview] = useState<string[]>([]);
 	const [infoDenunciation, setInfoDenunciation] = useState({
 		latitude: 0,
 		longitude: 0,
 		title: "",
 		description: "",
-		images: imagesSelected,
-		report_time: new Date().getTime(),
-		report_day: new Date().getDate(),
+		file: imagesSelected,
 	});
 	const [stateBarSearch, setStateBarSearch] = useState(false);
-	const [denunciation, setDenunciation] = useState(false);
+	const [denunciation, setDenunciation] = useState<boolean>(false);
+
+	// const [formSubmit, setFormSubmit] = useState<boolean>(false);
 
 	function handleMapClick(event: LeafletMouseEvent) {
 		const { lat: latitude, lng: longitude } = event.latlng;
@@ -39,41 +43,12 @@ export default function CreateDenunciation() {
 		setInfoDenunciation({ ...infoDenunciation, latitude, longitude });
 	}
 
-	function handleSelectImages(event: ChangeEvent<HTMLInputElement>) {
+	async function handleSelectImages(event: any) {
 		if (!event.target.files) return;
 
-		const images = Array.from(event.target.files);
-
-		setImagesSelected([...imagesSelected, ...images]);
-
-		let imgViews = images.map((image) => {
-			return URL.createObjectURL(image);
-		});
-		setImagesPreview([...imagesPreview, ...imgViews]);
-	}
-
-	function handleSubmit(event: FormEvent) {
-		event.preventDefault();
-
-		const data = new FormData();
-
-		data.append("title", infoDenunciation.title);
-		data.append("description", infoDenunciation.description);
-		data.append("latitude", String(infoDenunciation.latitude));
-		data.append("longitude", String(infoDenunciation.longitude));
-
-		imagesSelected?.map((image) => {
-			data.append("images", image);
-		});
-
-		api
-			.post("denunciations", data)
-			.then((response) => {
-				console.log("deu certo");
-				setDenunciation(true);
-			})
-			.catch((err) => console.error("Front-end ERROR:", err));
-		console.log(infoDenunciation);
+		const image = event.target.files[0];
+		setImagesSelected(image);
+		console.dir(imagesSelected);
 	}
 
 	async function loadGeoLocation() {
@@ -101,23 +76,62 @@ export default function CreateDenunciation() {
 		}
 	}
 
+	// post no firebase
+	const [urlImg, setUrlImg] = useState();
+	const [progress, setProgress] = useState(0);
+
+	async function handleSubmit(event: FormEvent) {
+		event.preventDefault();
+
+		if (imagesSelected) {
+			const storageRef = await agStorage.ref(imagesSelected.name);
+			const collectionRef = agFirestore.collection("denunciations");
+
+			storageRef.put(imagesSelected).on(
+				"state_changed",
+				(snapshot) => {
+					let percentage =
+						(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+					setProgress(percentage);
+				},
+				(err) => {
+					console.log(err);
+				},
+				async () => {
+					const url = await storageRef.getDownloadURL();
+
+					collectionRef.add({
+						url: url,
+						createdAt: timestamp(),
+						title: infoDenunciation.title,
+						description: infoDenunciation.description,
+						latitude: infoDenunciation.latitude,
+						longitude: infoDenunciation.longitude,
+					});
+				}
+			);
+
+			console.log("DEU ERRADO");
+		}
+	}
+
 	useEffect(() => {
 		loadGeoLocation();
 	}, []);
 
 	useEffect(() => {
-		setInfoDenunciation({
-			latitude: 0,
-			longitude: 0,
-			title: "",
-			description: "",
-			images: imagesSelected,
-			report_time: new Date().getTime(),
-			report_day: new Date().getDate(),
-		});
-		setImagesPreview([]);
-		setImagesSelected([]);
-	}, [denunciation]);
+		if (progress === 100) {
+			setInfoDenunciation({
+				latitude: 0,
+				longitude: 0,
+				title: "",
+				description: "",
+				file: imagesSelected,
+			});
+			setImagesPreview([]);
+			setImagesSelected(undefined);
+		}
+	}, [progress]);
 
 	return (
 		<div className="pageCreateDenunciation">
@@ -158,7 +172,7 @@ export default function CreateDenunciation() {
 					<fieldset className="pageCreateDenunciation-main-form__fieldset">
 						<legend>Dados</legend>
 
-						<div className="barSearchMap">
+						{/* <div className="barSearchMap">
 							{stateBarSearch && (
 								<input
 									className="barSearchMap__input"
@@ -173,7 +187,9 @@ export default function CreateDenunciation() {
 								stroke="black"
 								onClick={() => setStateBarSearch(true)}
 							/>
-						</div>
+						</div> */}
+						<div className="barSearchMap">Clique para selecionar o local</div>
+
 						<Map
 							center={[geoLocation.latitude, geoLocation.longitude]}
 							style={{ width: "100%", height: 280, zIndex: 4 }}
@@ -260,7 +276,6 @@ export default function CreateDenunciation() {
 							</div>
 
 							<input
-								multiple
 								onChange={handleSelectImages}
 								className="pageCreateDenunciation-main-form-groupInput__inputImg"
 								type="file"
@@ -282,4 +297,4 @@ export default function CreateDenunciation() {
 	);
 }
 
-// return `https://a.tile.openstreetmap.org/${z}/${x}/${y}.png`;
+// return `https://a.tile.openstreetmap.org/${z}/${x}/${y}.png`

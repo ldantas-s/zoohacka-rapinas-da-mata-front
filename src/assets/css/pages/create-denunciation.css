@@ -6,7 +6,7 @@
 .pageCreateDenunciation-header {
 	position: relative;
 	width: 100%;
-	min-height: 700px;
+	min-height: 810px;
 	background: url("../../images/bg.jpg") no-repeat;
 	background-size: cover;
 	display: flex;
@@ -67,7 +67,7 @@
 .pageCreateDenunciation-main-form__fieldset legend {
 	display: none;
 }
-.barSearchMap {
+/* .barSearchMap {
 	position: absolute;
 	top: 10px;
 	right: 20px;
@@ -81,6 +81,17 @@
 	background: white;
 	border-radius: 25px;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+} */
+
+.barSearchMap {
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	z-index: 10;
+	padding: 2px 7px;
+	border-radius: 2px;
+	background: white;
+	color: black;
 }
 .barSearchMap__icon {
 	position: absolute;
@@ -191,8 +202,10 @@
 		margin: -150px 0;
 	}
 	.pageCreateDenunciation-header {
+		min-height: 700px;
 		padding-top: 90px;
 	}
+
 	.pageCreateDenunciation-main-form {
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 		position: relative;

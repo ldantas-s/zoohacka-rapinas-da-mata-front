@@ -10,7 +10,7 @@ import "../assets/css/pages/create-denunciation.css";
 // utils
 import MapMarker from "../utils/MapMarker";
 //servies
-// import api from "../services/api";
+import api from "../services/api";
 
 export default function CreateDenunciation() {
 	// const hisotry = useHistory();
@@ -31,6 +31,7 @@ export default function CreateDenunciation() {
 		report_day: new Date().getDate(),
 	});
 	const [stateBarSearch, setStateBarSearch] = useState(false);
+	const [denunciation, setDenunciation] = useState(false);
 
 	function handleMapClick(event: LeafletMouseEvent) {
 		const { lat: latitude, lng: longitude } = event.latlng;
@@ -56,8 +57,8 @@ export default function CreateDenunciation() {
 
 		const data = new FormData();
 
-		data.append("name", infoDenunciation.title);
-		data.append("about", infoDenunciation.description);
+		data.append("title", infoDenunciation.title);
+		data.append("description", infoDenunciation.description);
 		data.append("latitude", String(infoDenunciation.latitude));
 		data.append("longitude", String(infoDenunciation.longitude));
 
@@ -65,12 +66,13 @@ export default function CreateDenunciation() {
 			data.append("images", image);
 		});
 
-		// api
-		// 	.post("orphanages", data)
-		// 	.then((response) => {
-		// 		hisotry.push("/orphanages");
-		// 	})
-		// 	.catch((err) => console.error("Front-end ERROR:", err));
+		api
+			.post("denunciations", data)
+			.then((response) => {
+				console.log("deu certo");
+				setDenunciation(true);
+			})
+			.catch((err) => console.error("Front-end ERROR:", err));
 		console.log(infoDenunciation);
 	}
 
@@ -103,6 +105,20 @@ export default function CreateDenunciation() {
 		loadGeoLocation();
 	}, []);
 
+	useEffect(() => {
+		setInfoDenunciation({
+			latitude: 0,
+			longitude: 0,
+			title: "",
+			description: "",
+			images: imagesSelected,
+			report_time: new Date().getTime(),
+			report_day: new Date().getDate(),
+		});
+		setImagesPreview([]);
+		setImagesSelected([]);
+	}, [denunciation]);
+
 	return (
 		<div className="pageCreateDenunciation">
 			<header className="pageCreateDenunciation-header">
@@ -126,6 +142,11 @@ export default function CreateDenunciation() {
 
 			<main className="pageCreateDenunciation-main">
 				<h2 className="pageCreateDenunciation-main__title">Denúncie:</h2>
+				{denunciation && (
+					<h2 className="pageCreateDenunciation-main__title">
+						Denúncia feita com sucesso
+					</h2>
+				)}
 				<form
 					className="pageCreateDenunciation-main-form"
 					onSubmit={handleSubmit}

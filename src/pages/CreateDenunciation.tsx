@@ -127,16 +127,20 @@ export default function CreateDenunciation() {
 				</h1>
 
 				<p className="pageCreateDenunciation-header__description">
-					Lorem Ipsum é simplesmente uma simulação de texto da indústria
-					tipográfica e de impressos, e vem sendo utilizado desde o século XVI,
-					quando um impressor desconhecido pegou uma bandeja de tipos e os
-					embaralhou para fazer um livro de modelos de tipos. Lorem Ipsum
-					sobreviveu não só a cinco séculos, como também ao salto para a
-					editoração eletrônica, permanecendo essencialmente inalterado. Se
-					popularizou na década de 60, quando a Letraset lançou decalques
-					contendo passagens de Lorem Ipsum, e mais recentemente quando passou a
-					ser integrado a softwares de editoração eletrônica como Aldus
-					PageMaker.
+					O comércio de animais silvestres no Brasil infelizmente é uma
+					realidade que ainda ocorre e as ações de fiscalização e combate aos
+					crimes contra a fauna são cada vez mais necessárias. Ao comprar um
+					animal silvestre, além da retirada do animal de seu ambiente natural,
+					há a privação do direito de viver na natureza juntamente com seus
+					semelhantes, diminuição de tempo de vida, uma vez que são submetidos a
+					situações estressantes como calor, aglomeração com outros animais,
+					limitação para expressar seu comportamento natural, etc. Pensando em
+					toda essa situação a equipe Rapinas da Mata, participante do
+					ZooHackatoon 2020 criou, além de um sistema blockchain para o combate
+					a falsificação de documentos, um canal de denúncia no qual você pode
+					realizar anonimamente uma denúncia e auxiliar a causa animal. Vale
+					lembrar que a nossa fauna é a casa de todos nós! E aí? bora ajudar
+					essa causa?
 				</p>
 			</header>
 

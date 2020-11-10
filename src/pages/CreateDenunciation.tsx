@@ -13,7 +13,7 @@ import MapMarker from "../utils/MapMarker";
 
 // import useStorage from "../hooks/useStorage";
 import { agFirestore, agStorage, timestamp } from "../firebase/config";
-import postFirebase from "../utils/postFirebase";
+// import postFirebase from "../utils/postFirebase";
 // import { info } from "console";
 
 export default function CreateDenunciation() {
@@ -42,14 +42,23 @@ export default function CreateDenunciation() {
 
 		setInfoDenunciation({ ...infoDenunciation, latitude, longitude });
 	}
+	const [urlImg, setUrlImg] = useState<string>();
 
-	async function handleSelectImages(event: any) {
+	async function handleSelectImages(event: ChangeEvent<HTMLInputElement>) {
 		if (!event.target.files) return;
 
 		const image = event.target.files[0];
 		setImagesSelected(image);
-		console.dir(imagesSelected);
+
+		// if (imagesSelected) setUrlImg(imagesSelected.path)
 	}
+	useEffect(() => {
+		if (imagesSelected) {
+			const url = URL.createObjectURL(imagesSelected);
+			console.dir(url);
+			setUrlImg(url);
+		}
+	}, [imagesSelected]);
 
 	async function loadGeoLocation() {
 		// Desktop GeoLocation
@@ -77,7 +86,6 @@ export default function CreateDenunciation() {
 	}
 
 	// post no firebase
-	const [urlImg, setUrlImg] = useState();
 	const [progress, setProgress] = useState(0);
 
 	async function handleSubmit(event: FormEvent) {
@@ -99,7 +107,6 @@ export default function CreateDenunciation() {
 				},
 				async () => {
 					const url = await storageRef.getDownloadURL();
-
 					collectionRef.add({
 						url: url,
 						createdAt: timestamp(),
@@ -262,7 +269,7 @@ export default function CreateDenunciation() {
 								>
 									<FiPlus size={24} stroke="#26a69a" />
 								</label>
-								{imagesPreview.map((path, index) => {
+								{/* {imagesPreview.map((path, index) => {
 									return (
 										<button
 											key={index}
@@ -272,7 +279,15 @@ export default function CreateDenunciation() {
 											<img src={path} alt="Hello" />
 										</button>
 									);
-								})}
+								})} */}
+								{urlImg && (
+									<button
+										type="button"
+										className="pageCreateDenunciation-main-form-groupInput-uploadedImg__img"
+									>
+										<img src={urlImg} alt="Hello" />
+									</button>
+								)}
 							</div>
 
 							<input

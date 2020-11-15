@@ -171,7 +171,11 @@
 	grid-template-columns: repeat(8, 1fr);
 	grid-gap: 5px;
 }
-
+.uploadBar {
+	width: 0;
+	height: 2px;
+	background: var(--color-primary);
+}
 .pageCreateDenunciation-main-form__btnConfirm {
 	margin-top: 64px;
 

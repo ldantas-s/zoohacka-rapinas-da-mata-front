@@ -35,15 +35,15 @@ export default function CreateDenunciation() {
 	const [stateBarSearch, setStateBarSearch] = useState(false);
 	const [denunciation, setDenunciation] = useState<boolean>(false);
 
-	// const [formSubmit, setFormSubmit] = useState<boolean>(false);
+	const [formSubmit, setFormSubmit] = useState<boolean>(false);
 
 	function handleMapClick(event: LeafletMouseEvent) {
 		const { lat: latitude, lng: longitude } = event.latlng;
 
 		setInfoDenunciation({ ...infoDenunciation, latitude, longitude });
 	}
-	const [urlImg, setUrlImg] = useState<string>();
 
+	const [urlImg, setUrlImg] = useState<string>();
 	async function handleSelectImages(event: ChangeEvent<HTMLInputElement>) {
 		if (!event.target.files) return;
 
@@ -87,19 +87,20 @@ export default function CreateDenunciation() {
 
 	// post no firebase
 	const [progress, setProgress] = useState(0);
+	const [getUrlImage, setGetUrlImage] = useState<string>("");
 
 	async function handleSubmit(event: FormEvent) {
 		event.preventDefault();
+		const collectionRef = agFirestore.collection("denunciations");
 
 		if (imagesSelected) {
 			const storageRef = await agStorage.ref(imagesSelected.name);
-			const collectionRef = agFirestore.collection("denunciations");
 
 			storageRef.put(imagesSelected).on(
 				"state_changed",
-				(snapshot) => {
+				async (snapshot) => {
 					let percentage =
-						(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+						(await (snapshot.bytesTransferred / snapshot.totalBytes)) * 100;
 					setProgress(percentage);
 				},
 				(err) => {
@@ -107,19 +108,22 @@ export default function CreateDenunciation() {
 				},
 				async () => {
 					const url = await storageRef.getDownloadURL();
-					collectionRef.add({
-						url: url,
-						createdAt: timestamp(),
-						title: infoDenunciation.title,
-						description: infoDenunciation.description,
-						latitude: infoDenunciation.latitude,
-						longitude: infoDenunciation.longitude,
-					});
+					setGetUrlImage(url);
 				}
 			);
-
-			console.log("DEU ERRADO");
 		}
+		collectionRef
+			.add({
+				url: getUrlImage,
+				createdAt: timestamp(),
+				title: infoDenunciation.title,
+				description: infoDenunciation.description,
+				latitude: infoDenunciation.latitude,
+				longitude: infoDenunciation.longitude,
+			})
+			.then(() => {
+				setFormSubmit(true);
+			});
 	}
 
 	useEffect(() => {
@@ -127,7 +131,7 @@ export default function CreateDenunciation() {
 	}, []);
 
 	useEffect(() => {
-		if (progress === 100) {
+		if (formSubmit) {
 			setInfoDenunciation({
 				latitude: 0,
 				longitude: 0,
@@ -137,8 +141,12 @@ export default function CreateDenunciation() {
 			});
 			setImagesPreview([]);
 			setImagesSelected(undefined);
+			setUrlImg(undefined);
+			setFormSubmit(false);
+			setProgress(0);
+			setGetUrlImage("");
 		}
-	}, [progress]);
+	}, [formSubmit]);
 
 	return (
 		<div className="pageCreateDenunciation">
@@ -297,6 +305,12 @@ export default function CreateDenunciation() {
 								name="images"
 								id="upImg"
 							/>
+							{progress && (
+								<div
+									style={{ width: `${progress}%` }}
+									className="uploadBar"
+								></div>
+							)}
 						</div>
 					</fieldset>
 
